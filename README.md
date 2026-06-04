@@ -1,26 +1,55 @@
 # Article Rewrite Suite
 
-`article-rewrite-suite` 是一个用于长文翻译、洗稿、改写、仿写和多版本生成的 Codex Skill。它的目标是：在保留原文结构、观点和论证顺序的前提下，重建表达，输出可直接发布的新稿。
+一个面向长文内容生产的 Codex Skill，用于翻译、洗稿、改写、仿写、多版本生成和长稿分批处理。它会尽量保留原文结构、观点、事实和论证顺序，同时重建表达，让输出更像一篇可直接发布的新稿，而不是机械同义词替换。
 
-## 能做什么
+## 适合谁
 
-- 翻译：中译英、英译中、跨语言本土化翻译。
-- 洗稿：保留结构和核心观点，重写表达，输出可发布正文。
-- 改写：润色、降重、增强逻辑、调整语气。
-- 仿写：提取原文结构和风格，用于同主题或新主题创作。
-- 多版本生成：一篇原文生成多个不同表达策略的版本。
-- 长文分批：处理较长稿件时维护事实、术语、结构和观点一致性。
-- 低模型辅助：把长文拆成小分块和短提示词，兼容能力较弱的智能体。
+- 需要把已有长文改写成可发布新稿的内容创作者。
+- 需要把英文/外文稿翻译成本土化中文稿的人。
+- 需要根据一篇样稿仿写同主题或新主题文章的人。
+- 需要一篇原文生成多个不同风格版本的运营、编辑或自媒体团队。
+- 使用基础模型能力一般、处理长文容易卡住的智能体用户。
+
+## 核心能力
+
+- **翻译**：中译英、英译中、跨语言本土化翻译。
+- **洗稿**：保留结构和核心观点，重写表达，输出可发布正文。
+- **改写**：润色、降重、增强逻辑、调整语气。
+- **仿写**：提取文章结构和风格，用于同主题或新主题创作。
+- **多版本生成**：同一篇原文生成多个表达策略不同的版本。
+- **长文分批**：维护事实、术语、结构和观点一致性。
+- **低模型辅助**：把长文拆成小分块和短提示词，让弱模型也能逐段完成。
+
+## 工作方式
+
+这个 skill 默认采用三段式流程：
+
+```text
+结构蒸馏 -> 表达重建 -> 质量与相似风险回检
+```
+
+它不会把原文逐句替换，而是先抽取：
+
+- 标题意图
+- 章节结构
+- 每段功能
+- 核心观点
+- 事实锁和术语锁
+- 风格指纹
+- 情绪推进
+- 结尾落点
+
+然后按段落功能重新写作。
 
 ## 安装
 
-推荐直接把仓库克隆到 Codex skills 目录下：
+推荐直接克隆到 Codex skills 目录：
 
 ```bash
 git clone git@github.com:Thorn-cf/article-rewrite-suite.git ~/.codex/skills/article-rewrite-suite
 ```
 
-或者下载本仓库后，把整个目录放到：
+或者下载仓库后，把整个目录放到：
 
 ```text
 ~/.codex/skills/article-rewrite-suite
@@ -36,7 +65,7 @@ git clone git@github.com:Thorn-cf/article-rewrite-suite.git ~/.codex/skills/arti
 使用 $article-rewrite-suite 帮我洗一下这篇稿子，保留结构和观点，输出一篇可发布的新稿。
 ```
 
-也可以用这些说法隐式触发：
+也可以用这些说法触发：
 
 - 洗稿
 - 改写
@@ -48,7 +77,7 @@ git clone git@github.com:Thorn-cf/article-rewrite-suite.git ~/.codex/skills/arti
 - 生成多篇结构一致的新稿
 - 质量不低于原文
 
-## 推荐用法
+## 示例 Prompt
 
 深度洗稿：
 
@@ -74,6 +103,12 @@ git clone git@github.com:Thorn-cf/article-rewrite-suite.git ~/.codex/skills/arti
 使用 $article-rewrite-suite 把这篇英文稿翻译并本土化成中文公众号文章，保留结构，语言自然，适合中文读者。
 ```
 
+长文分批：
+
+```text
+使用 $article-rewrite-suite 处理一篇长稿。我会分多次发送，请你维护结构、术语和观点一致性，每次只输出当前部分的可发布改写稿。
+```
+
 ## 默认输出规则
 
 生成文章时，默认只输出可发布正文：
@@ -92,7 +127,7 @@ git clone git@github.com:Thorn-cf/article-rewrite-suite.git ~/.codex/skills/arti
 
 ## 长文和低性能模型工作流
 
-如果长文太长，或者某些智能体基础模型能力较弱，可以使用脚本把任务拆小。
+当稿件很长，或某些智能体基础模型能力较弱时，可以先用脚本把任务拆小。
 
 生成任务包：
 
@@ -140,3 +175,14 @@ python3 scripts/prepare_rewrite_job.py input.md rewrite-job --chunk-chars 1000
     ├── assemble_rewrite.py
     └── prepare_rewrite_job.py
 ```
+
+## 维护建议
+
+- 修改核心触发和总体流程：编辑 `SKILL.md`。
+- 修改洗稿模式、仿写模式：编辑 `references/modes.md`。
+- 修改低模型分块流程：编辑 `references/low-capacity-model-workflow.md` 和 `scripts/`。
+- 修改安装后引导：编辑 `references/usage-guide.md`。
+
+## 注意
+
+这个 skill 会帮助提高原创表达和结构化改写质量，但不承诺“法律意义上的绝对安全”或“必然规避所有相似性风险”。涉及商业发布、版权敏感内容或高风险传播场景时，建议人工复核。
